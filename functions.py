@@ -1,7 +1,4 @@
--- FUNCTION: public.create_tables()
-
--- DROP FUNCTION public.create_tables();
-
+funcs = """
 CREATE TABLE IF NOT EXISTS sub_lines(line_id numeric(1) PRIMARY KEY,
 									 title text NOT NULL,
 									 tr_amount int NOT NULL DEFAULT 0,
@@ -129,19 +126,18 @@ CREATE OR REPLACE FUNCTION cnt_trains()
 RETURNS trigger AS
 $$
 DECLARE delta sub_lines.tr_amount%TYPE;
-		line_id trains.line_id%TYPE;
+		_line trains.line_id%TYPE;
 BEGIN
 	IF TG_OP = 'INSERT' THEN
 		delta = 1;
-		line_id = NEW.line_id;
+		_line = NEW.line_id;
 	ELSIF TG_OP = 'DELETE' THEN
 		delta = -1;
-		line_id = OLD.line_id;
+		_line = OLD.line_id;
 	END IF;
 	UPDATE sub_lines l 
 	SET tr_amount = tr_amount + delta
-	FROM trains tr
-	WHERE tr.line_id =l.line_id;
+	WHERE _line = l.line_id;
 	RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
@@ -153,7 +149,7 @@ AFTER INSERT OR DELETE ON trains
 FOR EACH ROW EXECUTE PROCEDURE cnt_trains();
 
 
-CREATE OR REPLACE FUNCTION delete_drivers_txt(_sname text) 
+CREATE OR REPLACE FUNCTION delete_drivers_by_name(_sname text) 
 RETURNS void
 AS $$
 BEGIN
@@ -163,7 +159,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION delete_trains_txt(_title text) 
+CREATE OR REPLACE FUNCTION delete_trains_by_title(_title text) 
 RETURNS void 
 AS $$
 BEGIN
@@ -173,7 +169,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION delete_lines_txt(_title text) 
+CREATE OR REPLACE FUNCTION delete_lines_by_title(_title text) 
 RETURNS void 
 AS $$
 BEGIN
@@ -183,7 +179,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION delete_drivers(_sname text, _age integer) 
+CREATE OR REPLACE FUNCTION delete_driver(_sname text, _age integer) 
 RETURNS void
 AS $$
 BEGIN
@@ -194,7 +190,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION delete_trains(_title text, _line numeric(1)) 
+CREATE OR REPLACE FUNCTION delete_train(_title text, _line numeric(1)) 
 RETURNS void 
 AS $$
 BEGIN
@@ -205,7 +201,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION delete_all_tr() 
+CREATE OR REPLACE FUNCTION clear_trains() 
 RETURNS void 
 AS $$
 BEGIN
@@ -214,7 +210,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION delete_all_dr() 
+CREATE OR REPLACE FUNCTION clear_drivers() 
 RETURNS void 
 AS $$
 BEGIN
@@ -223,7 +219,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION delete_all_lin() 
+CREATE OR REPLACE FUNCTION clear_lines() 
 RETURNS void 
 AS $$
 BEGIN
@@ -239,7 +235,7 @@ RETURNS void
 AS $$
 BEGIN
 	UPDATE drivers
-	SET second_name = _sname, age = _age, experrience = _exp
+	SET second_name = _sname, age = _age, experience = _exp
 	WHERE drivers.second_name = _oldname
 	AND drivers.age = _oldage;
 END;
@@ -276,6 +272,4 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-select * from drivers;
-select * from sub_lines;
-select * from trains;
+"""
