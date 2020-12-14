@@ -3,26 +3,32 @@
 -- DROP FUNCTION public.create_tables();
 
 CREATE TABLE IF NOT EXISTS sub_lines(line_id numeric(1) PRIMARY KEY,
-					  title text NOT NULL,
-					  tr_amount int NOT NULL DEFAULT 0);
-
+									 title text NOT NULL,
+									 tr_amount int NOT NULL DEFAULT 0,
+									 UNIQUE(title));
 
 CREATE TABLE IF NOT EXISTS drivers(driver_id numeric(3) PRIMARY KEY,
-					 second_name text NOT NULL,
-					 age int NOT NULL,
-					 experience int NOT NULL);
+								   second_name text NOT NULL,
+								   age int NOT NULL,
+								   experience int NOT NULL,
+								   UNIQUE(second_name, age));
+
+CREATE INDEX IF NOT EXISTS driver_name ON drivers(second_name);
 
 CREATE TABLE IF NOT EXISTS trains(train_id numeric(3) PRIMARY KEY,
-				   title text NOT NULL,
-				   line_id numeric(1) NOT NULL,
-					driver_id numeric(3) NOT NULL,
-				   FOREIGN KEY (line_id) REFERENCES sub_lines (line_id)
-					 ON DELETE CASCADE
-					 ON UPDATE CASCADE,
-				   FOREIGN KEY (driver_id) REFERENCES drivers (driver_id)
-					 ON DELETE CASCADE
-					 ON UPDATE CASCADE
+								   title text NOT NULL,
+								   line_id numeric(1) NOT NULL,
+									driver_id numeric(3) NOT NULL,
+								   FOREIGN KEY (line_id) REFERENCES sub_lines (line_id)
+									 ON DELETE CASCADE
+									 ON UPDATE CASCADE,
+								   FOREIGN KEY (driver_id) REFERENCES drivers (driver_id)
+									 ON DELETE CASCADE
+									 ON UPDATE CASCADE,
+								  UNIQUE (title, line_id)								  
 				   );
+				   
+CREATE INDEX IF NOT EXISTS train_title ON trains(title);
 
 CREATE OR REPLACE FUNCTION show_drivers() 
 RETURNS TABLE(driver_id numeric(3), second_name text, age integer, experience integer) 
@@ -57,7 +63,7 @@ CREATE OR REPLACE FUNCTION add_driver(_id numeric(3), _name text, _age integer, 
 RETURNS void 
 AS $$
 BEGIN
-	INSERT INTO driver VALUES(_id, _name, _age, _exp);
+	INSERT INTO drivers VALUES(_id, _name, _age, _exp);
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -119,5 +125,157 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
+CREATE OR REPLACE FUNCTION cnt_trains()
+RETURNS trigger AS
+$$
+DECLARE delta sub_lines.tr_amount%TYPE;
+		line_id trains.line_id%TYPE;
+BEGIN
+	IF TG_OP = 'INSERT' THEN
+		delta = 1;
+		line_id = NEW.line_id;
+	ELSIF TG_OP = 'DELETE' THEN
+		delta = -1;
+		line_id = OLD.line_id;
+	END IF;
+	UPDATE sub_lines l 
+	SET tr_amount = tr_amount + delta
+	FROM trains tr
+	WHERE tr.line_id =l.line_id;
+	RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+	
+DROP TRIGGER IF EXISTS cnt_trains ON trains;
 
+CREATE TRIGGER cnt_trains
+AFTER INSERT OR DELETE ON trains
+FOR EACH ROW EXECUTE PROCEDURE cnt_trains();
+
+
+CREATE OR REPLACE FUNCTION delete_drivers_txt(_sname text) 
+RETURNS void
+AS $$
+BEGIN
+	DELETE
+	FROM drivers
+	WHERE drivers.second_name = _sname;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION delete_trains_txt(_title text) 
+RETURNS void 
+AS $$
+BEGIN
+	DELETE
+	FROM trains tr
+	WHERE tr.title = _title;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION delete_lines_txt(_title text) 
+RETURNS void 
+AS $$
+BEGIN
+	DELETE
+	FROM sub_lines
+	WHERE title = _title;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION delete_drivers(_sname text, _age integer) 
+RETURNS void
+AS $$
+BEGIN
+	DELETE
+	FROM drivers
+	WHERE drivers.second_name = _sname
+	AND drivers.age = _age;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION delete_trains(_title text, _line numeric(1)) 
+RETURNS void 
+AS $$
+BEGIN
+	DELETE
+	FROM trains tr
+	WHERE tr.title = _title
+	AND tr.line_id = _line;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION delete_all_tr() 
+RETURNS void 
+AS $$
+BEGIN
+	DELETE
+	FROM trains;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION delete_all_dr() 
+RETURNS void 
+AS $$
+BEGIN
+	DELETE
+	FROM drivers;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION delete_all_lin() 
+RETURNS void 
+AS $$
+BEGIN
+	DELETE
+	FROM sub_lines;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION update_drivers(_oldname text, _oldage integer,
+										 _sname text, _age integer, 
+										  _exp integer) 
+RETURNS void
+AS $$
+BEGIN
+	UPDATE drivers
+	SET second_name = _sname, age = _age, experrience = _exp
+	WHERE drivers.second_name = _oldname
+	AND drivers.age = _oldage;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION update_trains(_oldtitle text, _oldline text,
+										_title text,
+										 _line text,
+										_driver text,
+										 _age integer) 
+RETURNS void 
+AS $$
+DECLARE new_line trains.line_id%TYPE;
+		new_driver trains.driver_id%TYPE;
+BEGIN
+	new_line = (SELECT line_id FROM sub_lines
+			  WHERE sub_lines.title = _oldline);
+	new_driver = (SELECT driver_id FROM drivers
+				 WHERE drivers.second_name = _driver
+				 AND drivers.age = _age);
+	UPDATE trains
+	SET title = _title, line_id = new_line, driver_id = new_driver
+	WHERE trains.title = _title;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION update_lines(_oldtitle text, _title text) 
+RETURNS void
+AS $$
+BEGIN
+	UPDATE sub_lines
+	SET title = _title
+	WHERE title = _oldtitle;
+END;
+$$ LANGUAGE 'plpgsql';
+
+select * from drivers;
 select * from sub_lines;
+select * from trains;
