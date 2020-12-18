@@ -191,7 +191,7 @@ class Buttons:
     def btn_delete_train(self, _title):
         self.con.execute(f"SELECT delete_trains_by_title('{_title}')")
 
-    def delete_one_train(self, _title):
+    def delete_one_train(self):
         self.child2 = Toplevel(self.child)
         self.child2.title("Delete Train")
         self.child2.geometry("250x250")
@@ -209,8 +209,26 @@ class Buttons:
         btn.config(bg='blue', fg='white', activebackground='yellow', activeforeground='green')
         btn.grid(row=2, column=1)
         
+    def find_trains_by_title(self):
+        self.child2 = Toplevel(self.child)
+        self.child2.title("Find Train")
+        self.child2.geometry("250x250")
+        lbl = Label(self.child2, text="Searching")
+        lbl.grid(row=0)
 
-    def find_trains_by_title(self, _title):
+        lbl_title = Label(self.child2, text="Title: ")
+        lbl_title.grid(row=1, column=0)
+
+        entry_title = Entry(self.child2, width=15)
+        entry_title.grid(row=1, column=1)
+
+        btn = Button(self.child2, text="Find train",
+                    command=lambda: self.btn_find_trains(entry_title.get()))
+        btn.config(bg='blue', fg='white', activebackground='yellow', activeforeground='green')
+        btn.grid(row=2, column=1)
+
+
+    def btn_find_trains(self, _title):
         self.child2 = Toplevel(self.main_root)
         self.child2.title("Trains Table")
         columns = ('train_id', 'title', 'line_id', 'driver_id')
@@ -284,7 +302,7 @@ class Buttons:
     def btn_delete_driver(self, _sname, _age):
         self.con.execute(f"SELECT delete_driver('{_sname}', {_age})")
 
-    def delete_one_driver(self, _sname, _age):
+    def delete_one_driver(self):
         self.child2 = Toplevel(self.child)
         self.child2.title("Delete Driver")
         self.child2.geometry("250x250")
@@ -306,8 +324,25 @@ class Buttons:
         btn.config(bg='blue', fg='white', activebackground='yellow', activeforeground='green')
         btn.grid(row=3, column=1)
 
+    def find_drivers_by_name(self):
+        self.child2 = Toplevel(self.child)
+        self.child2.title("Find Driver")
+        self.child2.geometry("250x250")
+        lbl = Label(self.child2, text="Searching")
+        lbl.grid(row=0)
 
-    def find_drivers_by_name(self, _sname):
+        lbl_name = Label(self.child2, text="Surname: ")
+        lbl_name.grid(row=1, column=0)
+
+        entry_name = Entry(self.child2, width=15)
+        entry_name.grid(row=1, column=1)
+
+        btn = Button(self.child2, text="Find driver",
+                    command=lambda: self.btn_find_drivers(entry_name.get()))
+        btn.config(bg='blue', fg='white', activebackground='yellow', activeforeground='green')
+        btn.grid(row=2, column=1)
+
+    def btn_find_drivers(self, _sname):
         self.child2 = Toplevel(self.main_root)
         self.child2.title("Trains Table")
         columns = ('driver_id', 'second_name', 'age', 'experience')
@@ -427,7 +462,27 @@ class Buttons:
         btn.config(bg='blue', fg='white', activebackground='yellow', activeforeground='green')
         btn.grid(row=2, column=1)
 
-    def find_lines_by_title(self, _title):
+
+    def find_lines_by_title(self):
+        self.child2 = Toplevel(self.child)
+        self.child2.title("Find Line")
+        self.child2.geometry("250x250")
+        lbl = Label(self.child2, text="Search")
+        lbl.grid(row=0)
+
+        lbl_title = Label(self.child2, text="Title: ")
+        lbl_title.grid(row=1, column=0)
+
+        entry_title = Entry(self.child2, width=15)
+        entry_title.grid(row=1, column=1)
+
+        btn = Button(self.child2, text="Delete line",
+                    command=lambda: self.btn_find_line(entry_title.get()))
+        btn.config(bg='blue', fg='white', activebackground='yellow', activeforeground='green')
+        btn.grid(row=2, column=1)
+
+
+    def btn_find_line(self, _title):
         self.child2 = Toplevel(self.main_root)
         self.child2.title("Trains Table")
         columns = ('line_id', 'title', 'tr_amount')
@@ -440,11 +495,8 @@ class Buttons:
         [self.tree.insert('', 'end', values=[str(val) for val in row]) for row in self.con.execute(f"SELECT * from find_lines('{_title}')")]
         self.tree.pack(fill="both", expand=True)
         
-
-
     def btn_update_line_title(self, _oldtitle, _title):
         self.con.execute(f"SELECT update_line_title('{_oldtitle}', '{_title}')")
-
 
     def update_one_line_title(self):
         self.child2 = Toplevel(self.child)
