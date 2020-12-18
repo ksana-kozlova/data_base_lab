@@ -39,9 +39,9 @@ class Buttons:
         btn_drivers = Button(_root, text="Drivers", width=15, bg='blue', fg='white', activebackground='yellow', activeforeground='green',
                             command=self.drivers_table)
         btn_drivers.place(x=200, y=215)
-        '''btn_lines = Button(_root, text="Lines", width=15, bg='blue', fg='white', activebackground='yellow', activeforeground='green',
+        btn_lines = Button(_root, text="Lines", width=15, bg='blue', fg='white', activebackground='yellow', activeforeground='green',
                             command=self.sublines_table)
-        btn_lines.place(x=350, y=215)'''
+        btn_lines.place(x=350, y=215)
         self.main_root.mainloop()
 
     def create_db(self):
@@ -99,26 +99,38 @@ class Buttons:
         btns[0].config(command=self.show_all_trains)
         btns[1].config(command=self.clear_trains_table)
         btns[2].config(command=self.add_new_train)
-        #btns[3].config(command=)
-        #btns[4].config(command=)
+        btns[3].config(command=self.delete_one_train)
+        btns[4].config(command=self.find_lines_by_title)
         
         
     
     def drivers_table(self):
         self.child = Toplevel(self.main_root)
-        self.child.title('Table Trains Controller')
+        self.child.title('Table Drivers Controller')
         self.child.geometry("500x250")
         
         btns = self.make_buttons("Table Drivers", 6)
-        btns[0].config(command=self.show_all_trains)
-        btns[1].config(command=self.clear_trains_table)
-        btns[2].config(command=self.add_new_train)
-        #btns[3].config(command=)
-        #btns[4].config(command=)
+        btns[0].config(command=self.show_all_drivers)
+        btns[1].config(command=self.clear_drivers_table)
+        btns[2].config(command=self.add_new_driver)
+        btns[3].config(command=self.delete_one_driver)
+        btns[4].config(command=self.find_drivers_by_name)
+        btns[5].config(command=self.update_one_driver)
     
-    # def sublines_table(self):
+    def sublines_table(self):
+        self.child = Toplevel(self.main_root)
+        self.child.title('Table Sublines Controller')
+        self.child.geometry("500x250")
+        
+        btns = self.make_buttons("Table Sublines", 6)
+        btns[0].config(command=self.show_all_lines)
+        btns[1].config(command=self.clear_lines_table)
+        btns[2].config(command=self.add_new_line)
+        btns[3].config(command=self.delete_one_line)
+        btns[4].config(command=self.find_lines_by_title)
+        btns[5].config(command=self.update_one_line_title)
 
-    #trains
+    #==========================================trains
 
    #def show_all_trains(self):
    #     self.child2 = Toplevel(self.main_root)
@@ -169,7 +181,7 @@ class Buttons:
         entry_driver = Entry(self.child2, width=15)
         entry_driver.grid(row=3, column=1)
         
-        btn = Button(self.child2, text="Add row",
+        btn = Button(self.child2, text="Add train",
                     command=lambda: self.btn_add_train(entry_id.get(), entry_title.get(), entry_line.get(), entry_driver.get()))
         btn.config(bg='blue', fg='white', activebackground='yellow', activeforeground='green')
         btn.grid(row=4, column=1)
@@ -197,7 +209,7 @@ class Buttons:
         
 
     def find_trains_by_title(self, _title):
-        self.con.execute(f"SELECT find_trains('{_title}')")
+        self.con.execute(f"SELECT * from find_trains('{_title}')")
 
 
     '''#don't touch pls
@@ -205,7 +217,7 @@ class Buttons:
         self.con.execute(f"SELECT update_train('{_oldtitle}', '{_oldline}', '{_title}', '{_line}', '{_driver}', {_age})")
     '''
 
-    #drivers
+    #==========================================drivers
 
     def show_all_drivers(self):
         self.con.execute("SELECT * from show_drivers()")
@@ -218,7 +230,7 @@ class Buttons:
     def btn_add_driver(self, _id, _name, _age, _exp):
         self.con.execute(f"SELECT add_driver({_id}, '{_name}', {_age}, {_exp})")
 
-    def add_new_driver(self, _id, _name, _age, _exp):
+    def add_new_driver(self):
         self.child2 = Toplevel(self.child)
         self.child2.title("Add new Driver")
         self.child2.geometry("250x250")
@@ -241,7 +253,7 @@ class Buttons:
         entry_exp = Entry(self.child2, width=15)
         entry_exp.grid(row=3, column=1)
         
-        btn = Button(self.child2, text="Add row",
+        btn = Button(self.child2, text="Add driver",
                     command=lambda: self.btn_add_driver(entry_id.get(), entry_name.get(), entry_age.get(), entry_exp.get()))
         btn.config(bg='blue', fg='white', activebackground='yellow', activeforeground='green')
         btn.grid(row=4, column=1)
@@ -261,52 +273,145 @@ class Buttons:
         lbl_age = Label(self.child2, text="Age: ")
         lbl_age.grid(row=2, column=0)
 
-        entry_title = Entry(self.child2, width=15)
-        entry_title.grid(row=1, column=1)
+        entry_name = Entry(self.child2, width=15)
+        entry_name.grid(row=1, column=1)
         entry_age = Entry(self.child2, width=15)
         entry_age.grid(row=2, column=1)
 
-        btn = Button(self.child2, text="Delete row",
+        btn = Button(self.child2, text="Delete driver",
                     command=lambda: self.btn_delete_driver(entry_name.get(), entry_age.get()))
         btn.config(bg='blue', fg='white', activebackground='yellow', activeforeground='green')
         btn.grid(row=3, column=1)
 
 
     def find_drivers_by_name(self, _sname):
-        self.con.execute(f"SELECT find_drivers('{_sname}')")
+        self.con.execute(f"SELECT * from find_drivers('{_sname}')")
 
-
-    def update_one_driver(self, _oldname, _oldage, _sname, _age, _exp):
+    def btn_update_driver(self, _oldname, _oldage, _sname, _age, _exp):
         self.con.execute(f"SELECT update_driver('{_oldname}', {_oldage}, '{_sname}', {_age}, {_exp})")
 
+    def update_one_driver(self):
+        self.child2 = Toplevel(self.child)
+        self.child2.title("Update Driver")
+        self.child2.geometry("250x250")
+        
+        lbl_oldname = Label(self.child2, text="Old name: ")
+        lbl_oldname.grid(row=0, column=0)
+        lbl_oldage = Label(self.child2, text="Old age: ")
+        lbl_oldage.grid(row=1, column=0)
+        lbl_name = Label(self.child2, text="Surname: ")
+        lbl_name.grid(row=2, column=0)
+        lbl_age = Label(self.child2, text="Age: ")
+        lbl_age.grid(row=3, column=0)
+        lbl_exp = Label(self.child2, text="Experience: ")
+        lbl_exp.grid(row=4, column=0)
 
-    #sublines
+        entry_oldname = Entry(self.child2, width=15)
+        entry_oldname.grid(row=0, column=1)
+        entry_oldage = Entry(self.child2, width=15)
+        entry_oldage.grid(row=1, column=1)
+        entry_name = Entry(self.child2, width=15)
+        entry_name.grid(row=2, column=1)
+        entry_age = Entry(self.child2, width=15)
+        entry_age.grid(row=3, column=1)
+        entry_exp = Entry(self.child2, width=15)
+        entry_exp.grid(row=4, column=1)
+        
+        btn = Button(self.child2, text="Update driver",
+                    command=lambda: self.btn_update_driver(entry_oldname.get(), entry_oldage.get(), entry_name.get(), entry_age.get(), entry_exp.get()))
+        btn.config(bg='blue', fg='white', activebackground='yellow', activeforeground='green')
+        btn.grid(row=4, column=1)
+
+
+    #==========================================sublines
 
     def show_all_lines(self):
         self.con.execute("SELECT * from show_lines()")
 
     def clear_lines_table(self):
         self.con.execute("SELECT clear_lines()")
+        mb.showinfo(title="Significant", message="Table Sublines cleared successfully!")
 
+    
 
-    def add_new_line(self, _id, _title, _trains):
+    def btn_add_line(self, _id, _title, _trains):
         self.con.execute(f"SELECT add_line({_id}, '{_title}', {_trains})")
 
+    def add_new_line(self):
+        self.child2 = Toplevel(self.child)
+        self.child2.title("Add new Driver")
+        self.child2.geometry("250x250")
+        
+        lbl_id = Label(self.child2, text="ID: ")
+        lbl_id.grid(row=0, column=0)
+        lbl_title = Label(self.child2, text="Title: ")
+        lbl_title.grid(row=1, column=0)
+        lbl_trains = Label(self.child2, text="Amount of trains: ")
+        lbl_trains.grid(row=2, column=0)
 
-    def delete_one_line(self, _title):
+        entry_id = Entry(self.child2, width=15)
+        entry_id.grid(row=0, column=1)
+        entry_title = Entry(self.child2, width=15)
+        entry_title.grid(row=1, column=1)
+        entry_trains = Entry(self.child2, width=15)
+        entry_trains.grid(row=2, column=1)
+        
+        btn = Button(self.child2, text="Add row",
+                    command=lambda: self.btn_add_line(entry_id.get(), entry_title.get(), entry_trains.get()))
+        btn.config(bg='blue', fg='white', activebackground='yellow', activeforeground='green')
+        btn.grid(row=3, column=1)
+
+
+    def btn_delete_line(self, _title):
         self.con.execute(f"SELECT delete_lines_by_title('{_title}')")
 
+    def delete_one_line(self):
+        self.child2 = Toplevel(self.child)
+        self.child2.title("Delete Line")
+        self.child2.geometry("250x250")
+        lbl = Label(self.child2, text="Deletion")
+        lbl.grid(row=0)
+
+        lbl_title = Label(self.child2, text="Title: ")
+        lbl_title.grid(row=1, column=0)
+
+        entry_title = Entry(self.child2, width=15)
+        entry_title.grid(row=1, column=1)
+
+        btn = Button(self.child2, text="Delete line",
+                    command=lambda: self.btn_delete_line(entry_title.get()))
+        btn.config(bg='blue', fg='white', activebackground='yellow', activeforeground='green')
+        btn.grid(row=2, column=1)
 
     def find_lines_by_title(self, _title):
-        self.con.execute(f"SELECT find_lines('{_title}')")
+        self.con.execute(f"SELECT * from find_lines('{_title}')")
 
 
-    def update_one_line_title(self, _oldtitle, _title):
+    def btn_update_line_title(self, _oldtitle, _title):
         self.con.execute(f"SELECT update_line_title('{_oldtitle}', '{_title}')")
 
 
+    def update_one_line_title(self):
+        self.child2 = Toplevel(self.child)
+        self.child2.title("Upadate Line")
+        self.child2.geometry("250x250")
+        lbl = Label(self.child2, text="Update")
+        lbl.grid(row=0)
 
+        lbl_oldtitle = Label(self.child2, text="Old title")
+        lbl_oldtitle.grid(row=1, column=0)
+        lbl_title = Label(self.child2, text="Title: ")
+        lbl_title.grid(row=2, column=0)
 
+        entry_oldtitle = Entry(self.child2, width=15)
+        entry_oldtitle.grid(row=1, column=1)
+        entry_title = Entry(self.child2, width=15)
+        entry_title.grid(row=2, column=1)
+
+        btn = Button(self.child2, text="Update line",
+                    command=lambda: self.btn_update_line_title(entry_oldtitle.get(), entry_title.get()))
+        btn.config(bg='blue', fg='white', activebackground='yellow', activeforeground='green')
+        btn.grid(row=3, column=1)
 
 
 if __name__ == '__main__':

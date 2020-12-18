@@ -87,9 +87,9 @@ RETURNS TABLE(driver_id numeric,
 			  experience integer) 
 AS $$
 BEGIN
-	SELECT driver_id, second_name, age, experience
+	RETURN QUERY (SELECT driver_id, second_name, age, experience
 	FROM drivers
-	WHERE driver.second_name = _sname;
+	WHERE driver.second_name = _sname);
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -100,13 +100,13 @@ RETURNS TABLE(train_id numeric,
 			  driver_id numeric)
 AS $$
 BEGIN
-	SELECT train_id, title, l.title ,d.second_name
+	RETURN QUERY (SELECT train_id, title, l.title ,d.second_name
 	FROM trains tr
 	LEFT JOIN sub_lines l
 		ON tr.line_id = l.line_id
 	LEFT JOIN drivers d
 		ON tr.driver_id = d.driver_id
-	WHERE tr.title = _title;
+	WHERE tr.title = _title);
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -116,9 +116,9 @@ RETURNS TABLE(line_id numeric,
 			  tr_amount int) 
 AS $$
 BEGIN
-	SELECT line_id, title, tr_amount
+	RETURN QUERY (SELECT line_id, title, tr_amount
 	FROM sub_lines
-	WHERE title = _title;
+	WHERE title = _title);
 END;
 $$ LANGUAGE 'plpgsql';
 
