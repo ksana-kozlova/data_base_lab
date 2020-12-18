@@ -6,7 +6,7 @@ BEGIN
         IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'subway') THEN
             PERFORM dblink_exec(
                 'dbname=postgres user=postgres password=postgres',
-                'create database subway with owner postgres'
+                'create database subway with owner lab'
           );
         END IF;
     END;
