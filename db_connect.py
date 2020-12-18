@@ -211,7 +211,18 @@ class Buttons:
         
 
     def find_trains_by_title(self, _title):
-        self.con.execute(f"SELECT * from find_trains('{_title}')")
+        self.child2 = Toplevel(self.main_root)
+        self.child2.title("Trains Table")
+        columns = ('train_id', 'title', 'line_id', 'driver_id')
+        self.tree = ttk.Treeview(self.child2, column=columns, height=18, show='headings')
+        widths = [100, 100, 100, 100]
+        for i in range(len(columns)):
+            self.tree.column(columns[i], width=widths[i], anchor=CENTER)
+            self.tree.heading(columns[i], text=columns[i])
+
+        [self.tree.insert('', 'end', values=[str(val) for val in row]) for row in self.con.execute(f"SELECT * from find_trains('{_title}')")]
+        self.tree.pack(fill="both", expand=True)
+        
 
 
     '''#don't touch pls
@@ -297,7 +308,18 @@ class Buttons:
 
 
     def find_drivers_by_name(self, _sname):
-        self.con.execute(f"SELECT * from find_drivers('{_sname}')")
+        self.child2 = Toplevel(self.main_root)
+        self.child2.title("Trains Table")
+        columns = ('driver_id', 'second_name', 'age', 'experience')
+        self.tree = ttk.Treeview(self.child2, column=columns, height=18, show='headings')
+        widths = [100, 100, 100, 100]
+        for i in range(len(columns)):
+            self.tree.column(columns[i], width=widths[i], anchor=CENTER)
+            self.tree.heading(columns[i], text=columns[i])
+
+        [self.tree.insert('', 'end', values=[str(val) for val in row]) for row in self.con.execute(f"SELECT * from find_drivers('{_sname}')")]
+        self.tree.pack(fill="both", expand=True)
+        
 
     def btn_update_driver(self, _oldname, _oldage, _sname, _age, _exp):
         self.con.execute(f"SELECT update_driver('{_oldname}', {_oldage}, '{_sname}', {_age}, {_exp})")
@@ -406,7 +428,18 @@ class Buttons:
         btn.grid(row=2, column=1)
 
     def find_lines_by_title(self, _title):
-        self.con.execute(f"SELECT * from find_lines('{_title}')")
+        self.child2 = Toplevel(self.main_root)
+        self.child2.title("Trains Table")
+        columns = ('line_id', 'title', 'tr_amount')
+        self.tree = ttk.Treeview(self.child2, column=columns, height=18, show='headings')
+        widths = [100, 100, 100]
+        for i in range(len(columns)):
+            self.tree.column(columns[i], width=widths[i], anchor=CENTER)
+            self.tree.heading(columns[i], text=columns[i])
+
+        [self.tree.insert('', 'end', values=[str(val) for val in row]) for row in self.con.execute(f"SELECT * from find_lines('{_title}')")]
+        self.tree.pack(fill="both", expand=True)
+        
 
 
     def btn_update_line_title(self, _oldtitle, _title):
