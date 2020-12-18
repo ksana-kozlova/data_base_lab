@@ -45,19 +45,19 @@ class Buttons:
         self.main_root.mainloop()
 
     def create_db(self):
-        self.engine = sa.create_engine("postgresql://postgres:123@localhost:5432/postgres", echo=True)
+        self.engine = sa.create_engine("postgresql://postgres:postgres@localhost:5432/postgres", echo=True)
         self.con = self.engine.connect()
         self.con.execute(creat)
         self.con.execute("SELECT create_database()")
 
-        self.engine = sa.create_engine("postgresql://postgres:123@localhost:5432/subway", echo=True)
+        self.engine = sa.create_engine("postgresql://postgres:postgres@localhost:5432/subway", echo=True)
         self.con = self.engine.connect()
         self.con.execute(sa.text(funcs))
         mb.showinfo(title="Significant", message="Databse created successfully!")
 
 
     def drop_db(self):
-        self.engine = sa.create_engine("postgresql://postgres:123@localhost:5432/postgres", echo=True)
+        self.engine = sa.create_engine("postgresql://postgres:postgres@localhost:5432/postgres", echo=True)
         self.con = self.engine.connect()
         self.con.execute("SELECT drop_database()")
 
@@ -116,6 +116,7 @@ class Buttons:
         btns[3].config(command=self.delete_one_driver)
         btns[4].config(command=self.find_drivers_by_name)
         btns[5].config(command=self.update_one_driver)
+
     
     def sublines_table(self):
         self.child = Toplevel(self.main_root)
@@ -140,16 +141,17 @@ class Buttons:
 
     def show_all_trains(self):
         self.child2 = Toplevel(self.main_root)
-        self.child2.title("lksdjfsoje")
+        self.child2.title("Trains Table")
         columns = ('train_id', 'title', 'line_id', 'driver_id')
-        headings = ('train_id', 'title', 'line_id', 'driver_id')
         self.tree = ttk.Treeview(self.child2, column=columns, height=18, show='headings')
         widths = [100, 100, 100, 100]
         for i in range(len(columns)):
             self.tree.column(columns[i], width=widths[i], anchor=CENTER)
-            self.tree.heading(columns[i], text=headings[i])
-        res = pd.DataFrame(self.con.execute("SELECT * from show_trains()"))
-        [self.tree.insert('', 'end', values=row) for ind, row in res.iterrows()]
+            self.tree.heading(columns[i], text=columns[i])
+
+        [self.tree.insert('', 'end', values=[str(val) for val in row]) for row in self.con.execute("SELECT * from show_trains()")]
+        self.tree.pack(fill="both", expand=True)
+
 
     def clear_trains_table(self):
         self.con.execute("SELECT clear_trains()")
@@ -220,7 +222,17 @@ class Buttons:
     #==========================================drivers
 
     def show_all_drivers(self):
-        self.con.execute("SELECT * from show_drivers()")
+        self.child2 = Toplevel(self.main_root)
+        self.child2.title("Trains Table")
+        columns = ('driver_id', 'second_name', 'age', 'experience')
+        self.tree = ttk.Treeview(self.child2, column=columns, height=18, show='headings')
+        widths = [100, 100, 100, 100]
+        for i in range(len(columns)):
+            self.tree.column(columns[i], width=widths[i], anchor=CENTER)
+            self.tree.heading(columns[i], text=columns[i])
+
+        [self.tree.insert('', 'end', values=[str(val) for val in row]) for row in self.con.execute("SELECT * from show_drivers()")]
+        self.tree.pack(fill="both", expand=True)
 
 
     def clear_drivers_table(self):
@@ -326,7 +338,17 @@ class Buttons:
     #==========================================sublines
 
     def show_all_lines(self):
-        self.con.execute("SELECT * from show_lines()")
+        self.child2 = Toplevel(self.main_root)
+        self.child2.title("Trains Table")
+        columns = ('line_id', 'title', 'tr_amount')
+        self.tree = ttk.Treeview(self.child2, column=columns, height=18, show='headings')
+        widths = [100, 100, 100]
+        for i in range(len(columns)):
+            self.tree.column(columns[i], width=widths[i], anchor=CENTER)
+            self.tree.heading(columns[i], text=columns[i])
+
+        [self.tree.insert('', 'end', values=[str(val) for val in row]) for row in self.con.execute("SELECT * from show_lines()")]
+        self.tree.pack(fill="both", expand=True)
 
     def clear_lines_table(self):
         self.con.execute("SELECT clear_lines()")
