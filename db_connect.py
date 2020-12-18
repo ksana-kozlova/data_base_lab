@@ -36,10 +36,10 @@ class Buttons:
         btn_trains = Button(_root, text="Trains", width=15, bg='blue', fg='white', activebackground='yellow', activeforeground='green',
                             command=self.trains_table)
         btn_trains.place(x=50, y=215)
-        '''btn_drivers = Button(_root, text="Drivers", width=15, bg='blue', fg='white', activebackground='yellow', activeforeground='green',
+        btn_drivers = Button(_root, text="Drivers", width=15, bg='blue', fg='white', activebackground='yellow', activeforeground='green',
                             command=self.drivers_table)
         btn_drivers.place(x=200, y=215)
-        btn_lines = Button(_root, text="Lines", width=15, bg='blue', fg='white', activebackground='yellow', activeforeground='green',
+        '''btn_lines = Button(_root, text="Lines", width=15, bg='blue', fg='white', activebackground='yellow', activeforeground='green',
                             command=self.sublines_table)
         btn_lines.place(x=350, y=215)'''
         self.main_root.mainloop()
@@ -104,7 +104,17 @@ class Buttons:
         
         
     
-    # def drivers_table(self):
+    def drivers_table(self):
+        self.child = Toplevel(self.main_root)
+        self.child.title('Table Trains Controller')
+        self.child.geometry("500x250")
+        
+        btns = self.make_buttons("Table Drivers", 6)
+        btns[0].config(command=self.show_all_trains)
+        btns[1].config(command=self.clear_trains_table)
+        btns[2].config(command=self.add_new_train)
+        #btns[3].config(command=)
+        #btns[4].config(command=)
     
     # def sublines_table(self):
 
@@ -190,7 +200,7 @@ class Buttons:
         self.con.execute(f"SELECT find_trains('{_title}')")
 
 
-    '''
+    '''#don't touch pls
     def update_one_train(self, _oldtitle, _oldline, _title, _line, _driver, _age)
         self.con.execute(f"SELECT update_train('{_oldtitle}', '{_oldline}', '{_title}', '{_line}', '{_driver}', {_age})")
     '''
@@ -203,14 +213,63 @@ class Buttons:
 
     def clear_drivers_table(self):
         self.con.execute("SELECT clear_drivers()")
-
-
-    def add_new_driver(self, _id, _name, _age, _exp):
+        mb.showinfo(title="Significant", message="Table Drivers cleared successfully!")
+ 
+    def btn_add_driver(self, _id, _name, _age, _exp):
         self.con.execute(f"SELECT add_driver({_id}, '{_name}', {_age}, {_exp})")
 
+    def add_new_driver(self, _id, _name, _age, _exp):
+        self.child2 = Toplevel(self.child)
+        self.child2.title("Add new Driver")
+        self.child2.geometry("250x250")
+        
+        lbl_id = Label(self.child2, text="ID: ")
+        lbl_id.grid(row=0, column=0)
+        lbl_name = Label(self.child2, text="Surname: ")
+        lbl_name.grid(row=1, column=0)
+        lbl_age = Label(self.child2, text="Age: ")
+        lbl_age.grid(row=2, column=0)
+        lbl_exp = Label(self.child2, text="Experience: ")
+        lbl_exp.grid(row=3, column=0)
+
+        entry_id = Entry(self.child2, width=15)
+        entry_id.grid(row=0, column=1)
+        entry_name = Entry(self.child2, width=15)
+        entry_name.grid(row=1, column=1)
+        entry_age = Entry(self.child2, width=15)
+        entry_age.grid(row=2, column=1)
+        entry_exp = Entry(self.child2, width=15)
+        entry_exp.grid(row=3, column=1)
+        
+        btn = Button(self.child2, text="Add row",
+                    command=lambda: self.btn_add_driver(entry_id.get(), entry_name.get(), entry_age.get(), entry_exp.get()))
+        btn.config(bg='blue', fg='white', activebackground='yellow', activeforeground='green')
+        btn.grid(row=4, column=1)
+
+    def btn_delete_driver(self, _sname, _age):
+        self.con.execute(f"SELECT delete_driver('{_sname}', {_age})")
 
     def delete_one_driver(self, _sname, _age):
-        self.con.execute(f"SELECT delete_driver('{_sname}', {_age})")
+        self.child2 = Toplevel(self.child)
+        self.child2.title("Delete Driver")
+        self.child2.geometry("250x250")
+        lbl = Label(self.child2, text="Deletion")
+        lbl.grid(row=0)
+
+        lbl_name = Label(self.child2, text="Surname: ")
+        lbl_name.grid(row=1, column=0)
+        lbl_age = Label(self.child2, text="Age: ")
+        lbl_age.grid(row=2, column=0)
+
+        entry_title = Entry(self.child2, width=15)
+        entry_title.grid(row=1, column=1)
+        entry_age = Entry(self.child2, width=15)
+        entry_age.grid(row=2, column=1)
+
+        btn = Button(self.child2, text="Delete row",
+                    command=lambda: self.btn_delete_driver(entry_name.get(), entry_age.get()))
+        btn.config(bg='blue', fg='white', activebackground='yellow', activeforeground='green')
+        btn.grid(row=3, column=1)
 
 
     def find_drivers_by_name(self, _sname):
