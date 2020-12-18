@@ -31,7 +31,7 @@ CREATE OR REPLACE FUNCTION show_drivers()
 RETURNS TABLE(driver_id numeric, second_name text, age integer, experience integer) 
 AS $$
 BEGIN
-	SELECT * FROM drivers;
+	RETURN QUERY SELECT * FROM drivers;
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -42,7 +42,7 @@ RETURNS TABLE(train_id numeric,
 			  driver_id numeric) 
 AS $$
 BEGIN
-	SELECT * FROM trains;
+	RETURN QUERY SELECT * FROM trains;
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -52,7 +52,7 @@ RETURNS TABLE(line_id numeric,
 			  tr_amount int) 
 AS $$
 BEGIN
-	SELECT * FROM sub_lines;
+	RETURN QUERY SELECT * FROM sub_lines;
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -64,7 +64,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION add_train(_id numeric, _title text, _line numeric, _driver numeric 
+CREATE OR REPLACE FUNCTION add_train(_id numeric, _title text, _line numeric, _driver numeric)
 RETURNS void 
 AS $$
 BEGIN
@@ -97,7 +97,7 @@ CREATE OR REPLACE FUNCTION find_trains(_title text)
 RETURNS TABLE(train_id numeric,
 			  title text,
 		   	  line_id numeric,
-			  driver_id numeric 
+			  driver_id numeric)
 AS $$
 BEGIN
 	SELECT train_id, title, l.title ,d.second_name
