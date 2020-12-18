@@ -5,8 +5,8 @@ AS $$
 BEGIN
         IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'subway') THEN
             PERFORM dblink_exec(
-                'dbname=postgres user=postgres password=123',
-                'create database subway with owner postgres'
+                'dbname=postgres user=postgres password=postgres',
+                'create database subway with owner lab'
           );
         END IF;
     END;
@@ -17,7 +17,7 @@ CREATE OR REPLACE FUNCTION drop_database() RETURNS void
 AS $$
 BEGIN
 		PERFORM dblink_exec(
-			'dbname=postgres user=postgres password=123',
+			'dbname=postgres user=postgres password=postgres',
 			'drop database if exists subway'
 	  );
     END;

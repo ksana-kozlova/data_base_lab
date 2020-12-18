@@ -15,7 +15,7 @@ class Buttons:
     child = None
     child2 = None
     btn_names_main = ["Create DB", "Drop DB", "Clear all tables", "Trains", "Drivers", "Lines"]
-    btn_names = ["Show table", "Clear Table", "Add row", "Delete Table", "Search", "Update"]
+    btn_names = ["Show table", "Clear Table", "Add row", "Delete row", "Search", "Update"]
     def __init__(self, _root):
 
         self.main_root = _root
@@ -60,7 +60,8 @@ class Buttons:
         self.engine = sa.create_engine("postgresql://postgres:postgres@localhost:5432/postgres", echo=True)
         self.con = self.engine.connect()
         self.con.execute("SELECT drop_database()")
-
+        self.con.close()
+        mb.showinfo(title="Significant", message="Databse deleted successfully!")
 
     def clear_all_tables(self): 
         self.con.execute("SELECT clear_trains()")
@@ -476,7 +477,7 @@ class Buttons:
         entry_title = Entry(self.child2, width=15)
         entry_title.grid(row=1, column=1)
 
-        btn = Button(self.child2, text="Delete line",
+        btn = Button(self.child2, text="Search line",
                     command=lambda: self.btn_find_line(entry_title.get()))
         btn.config(bg='blue', fg='white', activebackground='yellow', activeforeground='green')
         btn.grid(row=2, column=1)
@@ -524,6 +525,3 @@ class Buttons:
 if __name__ == '__main__':
     root = Tk()
     db = Buttons(root)
-    #db.create_db()
-    #db.add_new_line(1, "my", 0)
-    #db.show_all_lines()
