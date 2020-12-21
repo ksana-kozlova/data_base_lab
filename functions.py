@@ -93,7 +93,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION find_trains(_title text) 
+CREATE OR REPLACE FUNCTION find_trains(_title text, _line numeric, _driver numeric) 
 RETURNS TABLE(train_id numeric,
 			  title text,
 		   	  line_id numeric,
@@ -106,19 +106,9 @@ BEGIN
 		ON tr.line_id = l.line_id
 	LEFT JOIN drivers d
 		ON tr.driver_id = d.driver_id
-	WHERE tr.title = _title);
-END;
-$$ LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION find_lines(_title text) 
-RETURNS TABLE(line_id numeric,
-			  title text,
-			  tr_amount int) 
-AS $$
-BEGIN
-	RETURN QUERY (SELECT sl.line_id, sl.title, sl.tr_amount
-	FROM sub_lines sl
-	WHERE sl.title = _title);
+	WHERE tr.title = _title
+	AND tr.line_id = _line
+	AND tr.driver_id = _driver);
 END;
 $$ LANGUAGE 'plpgsql';
 

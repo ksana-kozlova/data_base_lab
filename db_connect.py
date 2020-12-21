@@ -219,17 +219,26 @@ class Buttons:
 
         lbl_title = Label(self.child2, text="Title: ")
         lbl_title.grid(row=1, column=0)
+        lbl_line = Label(self.child2, text="Line: ")
+        lbl_line.grid(row=2, column=0)
+        lbl_driver = Label(self.child2, text="Driver: ")
+        lbl_driver.grid(row=3, column=0)
+
 
         entry_title = Entry(self.child2, width=15)
         entry_title.grid(row=1, column=1)
+        entry_line = Entry(self.child2, width=15)
+        entry_line.grid(row=2, column=1)
+        entry_driver = Entry(self.child2, width=15)
+        entry_driver.grid(row=3, column=1)
 
         btn = Button(self.child2, text="Find train",
-                    command=lambda: self.btn_find_trains(entry_title.get()))
+                    command=lambda: self.btn_find_trains(entry_title.get(), entry_line.get(), entry_driver.get()))
         btn.config(bg='blue', fg='white', activebackground='yellow', activeforeground='green')
-        btn.grid(row=2, column=1)
+        btn.grid(row=4, column=1)
 
 
-    def btn_find_trains(self, _title):
+    def btn_find_trains(self, _title, _line, _driver):
         self.child2 = Toplevel(self.main_root)
         self.child2.title("Trains Table")
         columns = ('train_id', 'title', 'line_id', 'driver_id')
@@ -239,8 +248,9 @@ class Buttons:
             self.tree.column(columns[i], width=widths[i], anchor=CENTER)
             self.tree.heading(columns[i], text=columns[i])
 
-        [self.tree.insert('', 'end', values=[str(val) for val in row]) for row in self.con.execute(f"SELECT * from find_trains('{_title}')")]
+        [self.tree.insert('', 'end', values=[str(val) for val in row]) for row in self.con.execute(f"SELECT * from find_trains('{_title}', '{_line}', '{_drivers}')")]
         self.tree.pack(fill="both", expand=True)
+
         
 
 
